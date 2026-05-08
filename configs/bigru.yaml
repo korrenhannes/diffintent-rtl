@@ -1,0 +1,21 @@
+model_name: bigru
+model_type: bigru
+representation: flat
+text_source: diff
+vocab:
+  min_frequency: 1
+  max_size: 50000
+training:
+  batch_size: 128
+  learning_rate: 0.001
+  weight_decay: 0.01
+  epochs: 6
+  early_stopping_patience: 2
+  lambda_hole: 1.0
+  task_mode: multitask
+optimizer: AdamW
+model:
+  embedding_dim: 128
+  hidden_dim: 128
+  num_layers: 1
+  dropout: 0.2

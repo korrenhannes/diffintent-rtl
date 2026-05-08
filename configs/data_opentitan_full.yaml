@@ -1,0 +1,29 @@
+repo:
+  url: https://github.com/lowRISC/opentitan.git
+  local_path: external/opentitan
+paths:
+  raw_candidates: data/raw/opentitan_rtl_commits.jsonl
+  real_examples: data/processed/opentitan_real_examples.jsonl
+  with_holes: data/processed/opentitan_with_holes.jsonl
+  train_split: data/splits/train.jsonl
+  val_split: data/splits/val.jsonl
+  test_split: data/splits/test.jsonl
+  discarded_examples: outputs/logs/discarded_examples.jsonl
+  dataset_stats: outputs/metrics/dataset_stats.json
+mining:
+  strict_rtl_only: true
+  max_commits: null
+  max_examples: null
+  max_rtl_files_per_commit: 3
+  prefer_single_rtl_file: true
+  max_diff_lines: 256
+preprocessing:
+  max_lines_per_diff: 128
+  max_tokens_per_line: 64
+  max_total_tokens_flat: 2048
+  keep_context_lines: true
+split:
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+

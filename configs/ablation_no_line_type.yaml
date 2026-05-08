@@ -1,0 +1,25 @@
+model_name: hierarchical_no_line_type
+model_type: hierarchical_transformer
+representation: hierarchical
+text_source: diff
+vocab:
+  min_frequency: 1
+  max_size: 50000
+training:
+  batch_size: 32
+  learning_rate: 0.0005
+  weight_decay: 0.01
+  epochs: 6
+  early_stopping_patience: 2
+  lambda_hole: 1.0
+  task_mode: multitask
+optimizer: AdamW
+model:
+  token_embedding_dim: 128
+  line_type_embedding_dim: 32
+  line_hidden_dim: 128
+  transformer_layers: 2
+  transformer_heads: 4
+  transformer_ff_dim: 512
+  dropout: 0.2
+  use_line_type_embeddings: false

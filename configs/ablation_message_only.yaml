@@ -1,0 +1,13 @@
+model_name: tfidf_message_only
+model_type: tfidf_lr
+text_source: message
+vectorizer:
+  max_features: 50000
+  word_ngram_range: [1, 2]
+  char_ngram_range: [3, 5]
+  word_max_features: 25000
+  char_max_features: 25000
+classifier:
+  max_iter: 500
+  class_weight: balanced
+

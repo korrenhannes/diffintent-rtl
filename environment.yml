@@ -1,0 +1,14 @@
+name: diffintent-rtl
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pytorch>=2.2
+  - numpy>=1.26
+  - pandas>=2.2
+  - scikit-learn>=1.4
+  - matplotlib>=3.8
+  - pyyaml>=6.0
+  - pytest>=8.0
+

@@ -1,0 +1,35 @@
+{
+  "avg_diff_line_count": 37.678,
+  "example_counts": {
+    "test": 797,
+    "train": 3873,
+    "val": 830
+  },
+  "group_counts": {
+    "test": 427,
+    "train": 1990,
+    "val": 426
+  },
+  "hole_distribution": {
+    "complete": 2843,
+    "synthetic_hole": 2657
+  },
+  "intent_distribution": {
+    "bug_fix": 1861,
+    "configuration_timing": 934,
+    "feature_or_behavior_change": 2240,
+    "refactor_cleanup": 465
+  },
+  "mutation_distribution": {
+    "drop_added_line": 2058,
+    "drop_hunk": 12,
+    "flip_binary_constant": 24,
+    "flip_comparison_operator": 8,
+    "flip_logical_operator": 2,
+    "none": 2843,
+    "remove_added_guard_or_assertion": 528,
+    "remove_reset_or_default_assignment": 25
+  },
+  "num_examples": 5500,
+  "num_groups": 2843
+}
