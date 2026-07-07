@@ -54,7 +54,7 @@ def is_candidate_rtl_path(path: str, strict_rtl_only: bool = True) -> bool:
     normalized = "/" + path.strip("/")
     if any(part in normalized for part in EXCLUDED_PATH_PARTS):
         return False
-    if not path.startswith("hw/") or not path.endswith(".sv"):
+    if not (path.startswith("hw/") or path.startswith("src/")) or not path.endswith(".sv"):
         return False
     if strict_rtl_only:
         return "/rtl/" in normalized
@@ -94,6 +94,7 @@ def list_commits(repo_dir: Path | str, max_commits: int | None = None) -> list[d
             "--pretty=format:%H%x1f%P%x1f%cI%x1f%s%x1e",
             "--",
             "hw",
+            "src",
         ],
     )
     records = _parse_commit_log(raw_log)
@@ -118,6 +119,7 @@ def list_commits_with_changed_files(
             "--pretty=format:\x1e%H\x1f%P\x1f%cI\x1f%s",
             "--",
             "hw",
+            "src",
         ],
     )
     records: list[dict[str, Any]] = []
