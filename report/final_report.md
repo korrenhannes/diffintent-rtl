@@ -2,7 +2,7 @@
 
 **Course:** Deep Learning Project  
 **Project:** DiffIntent-RTL  
-**Team members:** Korren Hannes, Noa Sabag  
+**Team members:** Korren Hannes, Noa Sebbag  
 **Code:** https://github.com/korrenhannes/diffintent-rtl
 
 ## 1. Motivation and Problem Definition
@@ -236,7 +236,7 @@ The following table is copied from [../outputs/metrics/ablation_results.csv](../
 Three conclusions are already clear from the final tables.
 
 1. **Intent classification is won by TF-IDF, not by the neural models.**  
-   `full_tfidf_lr` reaches the best intent macro-F1 (`0.4197`), comfortably above the neural models (`0.2961` to `0.3023`).
+   `full_tfidf_lr` reaches the best intent macro-F1 (`0.4197`), comfortably above the neural models (`0.2961` to `0.3023`). We note, however, that the executed full run used a short early-stopping budget (patience 2), so part of this gap may reflect under-training of the neural models rather than an inherent advantage of the lexical baseline.
 
 2. **Hole detection is won by the hierarchical Transformer.**  
    `full_hierarchical_transformer` reaches the best hole F1 (`0.6029`) and the best hole AUROC (`0.7352`).
@@ -409,7 +409,7 @@ The weak labeler assigns intent from commit-message keywords, and a large share 
 
 #### Cross-project generalization
 
-To test whether the pipeline generalizes beyond OpenTitan, we extended the mining rules to also accept `src/`-style layouts and applied the pipeline to Caliptra, an independent open-source hardware-security project. Two generalization gaps emerged. First, the weak labeler transfers poorly (the higher discard rate above). Second, the change-type profile differs sharply: OpenTitan changes are feature-dominated (77%) while Caliptra changes are bug-fix-dominated (82%). Together these indicate that a model trained on a single project should be expected to degrade on projects with a different style and change distribution.
+To test whether the pipeline generalizes beyond OpenTitan, we extended the mining rules to also accept `src/`-style layouts and applied the pipeline to Caliptra, an independent open-source hardware-security project. Two generalization gaps emerged. First, the weak labeler transfers poorly (the higher discard rate above). Second, the change-type profile differs sharply: OpenTitan changes are feature-dominated (77%) while Caliptra changes are bug-fix-dominated (82%). Together these indicate that a model trained on a single project should be expected to degrade on projects with a different style and change distribution. These figures are computed at smoke scale (tens of mined examples per project) and should be read as a preliminary, directional result.
 
 #### Hardware-aware feature model
 
@@ -424,6 +424,8 @@ The takeaway is not that hand-crafted features beat text, but that a small, inte
 Finally, we packaged the models into a small application layer: a `review(diff)` function that returns the predicted change intent together with a completeness warning derived from the hole-detection model. On held-out examples it separates complete changes (hole score ~0.2) from synthetic incomplete ones (~0.5), illustrating how the approach could support RTL code review in practice.
 
 ## 8. Limitations and Future Work
+
+- **The intent labels partially leak from commit messages.** The `message_only` ablation reaches macro-F1 `0.9855`, showing the weak label is almost recoverable from the very commit message it was derived from. The intent benchmark is therefore useful for repository-scale study but is **not a clean test of pure code-diff understanding**; a manually-labeled or diff-only evaluation is needed to make that claim.
 
 The main limitations are:
 
