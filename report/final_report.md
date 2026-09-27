@@ -2,7 +2,8 @@
 
 **Course:** Deep Learning Project  
 **Project:** DiffIntent-RTL  
-**Team members:** Korren Hannes, Noa Sabag
+**Team members:** Korren Hannes, Noa Sabag  
+**Code:** https://github.com/korrenhannes/diffintent-rtl
 
 ## 1. Motivation and Problem Definition
 
@@ -397,6 +398,8 @@ The project therefore produces a mixed but meaningful outcome:
 That is a scientifically valid result even though the intended “deep model wins on everything” story did not happen.
 
 ### 7.7 Extended Studies
+
+> Note: unless stated otherwise, the studies in this section use a smaller *medium*-scale mined dataset and their own train/test protocol. Their absolute numbers are therefore **not directly comparable** to the full-dataset results in Section 6.
 
 Beyond the core benchmark, we ran four additional studies that probe *why* the models behave as they do and *whether* the approach extends beyond a single project.
 
