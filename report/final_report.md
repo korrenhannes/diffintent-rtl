@@ -451,7 +451,7 @@ Future work should focus on manual label validation, broader hole operators, ric
 
 **Korren Hannes** built the core infrastructure: the data-mining pipeline (commit extraction, diff parsing, weak intent labeling, synthetic hole generation, tokenization), the four models (TF-IDF + Logistic Regression, MLP, BiGRU, hierarchical Transformer) with the shared multi-task head, the training and evaluation code, the ablation suite, the initial full runs and main results, and the first report draft.
 
-**Noa Sabag** contributed the analysis and extension layer built on that infrastructure: the per-class error analysis and confusion-matrix study explaining the intent-classification gap; the improved weak-labeling scheme; the cross-project generalization study on Caliptra (including the mining extension to `src/` layouts); the hardware-aware feature model with 5-fold cross-validation and per-class feature analysis; and the code-review assistant demo, together with the corresponding figures and the report sections describing them (Section 7.7).
+**Noa Sebbag** contributed the analysis and extension layer built on that infrastructure: the per-class error analysis and confusion-matrix study explaining the intent-classification gap; the improved weak-labeling scheme; the cross-project generalization study on Caliptra (including the mining extension to `src/` layouts); the hardware-aware feature model with 5-fold cross-validation and per-class feature analysis; and the code-review assistant demo, together with the corresponding figures and the report sections describing them (Section 7.7).
 
 ## 10. References
 
