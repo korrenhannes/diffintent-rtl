@@ -19,7 +19,7 @@ conda activate diffintent-rtl
 
 ## Data Construction
 
-The pipeline mines modified `hw/**/rtl/*.sv` files from OpenTitan while excluding DV, test, vendor, third-party, generated, build, and output paths.
+The pipeline mines modified RTL `*.sv` files (under `hw/**/rtl/` for OpenTitan and `src/**/rtl/` for Caliptra-style layouts) while excluding DV, test, vendor, third-party, generated, build, and output paths.
 
 Dataset construction steps:
 
@@ -72,6 +72,59 @@ Current saved full outputs in `outputs/metrics/main_results.csv` show:
 - `full_bigru`: intent macro-F1 `0.3023`, hole F1 `0.4204`, hole AUROC `0.5942`
 - `full_hierarchical_transformer`: intent macro-F1 `0.3007`, hole F1 `0.6029`, hole AUROC `0.7352`
 
+## Additional Studies
+
+These studies extend the base experiment with deeper analysis, an improved labeler, a hardware-aware model, and a cross-project generalization test. They only require `pyyaml`, `numpy`, `matplotlib`, and `scikit-learn` (no GPU).
+
+### Error analysis
+
+Produces per-class intent F1 and confusion matrices from the saved test predictions (no training or download required):
+
+```bash
+python3 scripts/error_analysis.py
+```
+
+Finding: the macro-F1 gap is driven by the rare `refactor_cleanup` class, on which the Hierarchical Transformer collapses (F1 = 0.00), explaining why the lexical baseline outperforms the neural models on intent classification.
+
+### Improved weak labeling
+
+The keyword lists in `src/data/labeling.py` were expanded with cross-project synonyms. This reduced the share of commits discarded by the weak labeler from 29% to 16% on OpenTitan and from 53% to 25% on Caliptra.
+
+### Cross-project generalization (Caliptra)
+
+`src/data/git_mining.py` was extended to also accept `src/`-style layouts, enabling mining from a second hardware project. To reproduce:
+
+```bash
+git clone --depth 300 https://github.com/lowRISC/opentitan.git external/opentitan
+git clone --depth 300 https://github.com/chipsalliance/caliptra-rtl.git external/caliptra
+python3 scripts/extract_commits.py --config configs/data_opentitan_smoke.yaml
+python3 scripts/extract_commits.py --config configs/data_caliptra_smoke.yaml
+python3 scripts/generalization_study.py
+```
+
+Finding: the weak labeler and change-type profile do not transfer cleanly across projects (OpenTitan is feature-dominated, Caliptra is bug-fix-dominated), indicating limited generalization from a single project.
+
+### Hardware-aware feature model
+
+A fifth intent model that extracts hardware-aware features (lines added/removed, whether the change touches reset / always_ff / parameters / assertions, control-flow counts, etc.) and trains a Random Forest, compared against the lexical baseline and a hybrid. Uses the larger `data_opentitan_medium.yaml` dataset.
+
+```bash
+python3 scripts/extract_commits.py --config configs/data_opentitan_medium.yaml
+python3 scripts/build_dataset.py --config configs/data_opentitan_medium.yaml
+python3 scripts/rtl_features_model.py
+```
+
+Finding: hardware-aware features with a Random Forest reach intent macro-F1 of 0.527 versus 0.379 for the lexical baseline on the same split (preliminary, single split on the medium dataset).
+
+### Code-review assistant (demo)
+
+Trains light intent and hole-detection models and exposes a `review(diff)` function returning the predicted intent plus a completeness warning.
+
+```bash
+python3 scripts/generate_holes.py --config configs/data_opentitan_medium.yaml
+python3 scripts/code_review_assistant.py
+```
+
 ## Results Reproduction
 
 - Main results table: `outputs/metrics/main_results.csv`
@@ -80,13 +133,13 @@ Current saved full outputs in `outputs/metrics/main_results.csv` show:
 - Smoke-only copies: `outputs/metrics/smoke_main_results.csv`, `outputs/metrics/smoke_ablation_results.csv`
 - Dataset stats: `outputs/metrics/dataset_stats.json`
 - Predictions: `outputs/predictions/*.jsonl`
-- Figures: `outputs/figures/*.png`
+- Figures: `outputs/figures/*.png`, `report/figures/*.png`
 - Saved configs/checkpoints: `outputs/checkpoints/*`
 
 ## File Structure
 
-- `configs/`: data/model/ablation configs
-- `scripts/`: mining, preprocessing, training, evaluation, and orchestration scripts
+- `configs/`: data/model/ablation configs (including `data_caliptra_smoke.yaml` and `data_opentitan_medium.yaml`)
+- `scripts/`: mining, preprocessing, training, evaluation, orchestration, and analysis scripts (including `error_analysis.py`, `generalization_study.py`, `rtl_features_model.py`, `code_review_assistant.py`)
 - `src/`: reusable data/model/training code
 - `data/`: mined raw data, processed examples, and splits
 - `outputs/`: checkpoints, metrics, figures, predictions, and logs
@@ -100,3 +153,4 @@ Current saved full outputs in `outputs/metrics/main_results.csv` show:
 - The models operate on normalized textual diffs rather than HDL-specific semantic graphs.
 - Full experiment runtime depends on the available CPU/GPU resources.
 - The full experiment now exists on disk, but the auxiliary full ablations were run on the reference seed rather than all three seeds.
+- The cross-project generalization and hardware-feature results were produced at smoke/medium scale on single splits and should be regarded as preliminary.
