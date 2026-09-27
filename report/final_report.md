@@ -2,7 +2,7 @@
 
 **Course:** Deep Learning Project  
 **Project:** DiffIntent-RTL  
-**Team members:** `[fill in]`, `[fill in]`
+**Team members:** Korren Hannes, Noa Sabag
 
 ## 1. Motivation and Problem Definition
 
@@ -396,6 +396,30 @@ The project therefore produces a mixed but meaningful outcome:
 
 That is a scientifically valid result even though the intended “deep model wins on everything” story did not happen.
 
+### 7.7 Extended Studies
+
+Beyond the core benchmark, we ran four additional studies that probe *why* the models behave as they do and *whether* the approach extends beyond a single project.
+
+#### Improved weak labeling
+
+The weak labeler assigns intent from commit-message keywords, and a large share of commits match no keyword and are discarded. We expanded the keyword lists with cross-project synonyms (e.g. *enhance, improve, update, resolve, restructure*). This lowered the discard rate from 29% to 16% on OpenTitan and, more importantly, from 53% to 25% on the second project (Caliptra), narrowing the cross-project gap from 24 to 9 percentage points. The remaining failures come from messages that describe *what* changed rather than *why*, which keyword matching cannot resolve, motivating future LLM-based labeling.
+
+#### Cross-project generalization
+
+To test whether the pipeline generalizes beyond OpenTitan, we extended the mining rules to also accept `src/`-style layouts and applied the pipeline to Caliptra, an independent open-source hardware-security project. Two generalization gaps emerged. First, the weak labeler transfers poorly (the higher discard rate above). Second, the change-type profile differs sharply: OpenTitan changes are feature-dominated (77%) while Caliptra changes are bug-fix-dominated (82%). Together these indicate that a model trained on a single project should be expected to degrade on projects with a different style and change distribution.
+
+#### Hardware-aware feature model
+
+Motivated by the finding that the lexical baseline beats the neural models on intent, we tested whether compact, interpretable hardware features can capture the same signal. We extracted 18 hardware-aware features from each diff (lines added/removed and their ratio, and whether the change touches reset, `always_ff`/`always_comb`, parameters, assertions, signal declarations, and control flow) and trained a Random Forest.
+
+Under 5-fold cross-validation on the medium dataset the model reached an intent macro-F1 of 0.525 +/- 0.114, essentially on par with the TF-IDF baseline evaluated under the same protocol (0.544 +/- 0.053). Two points are worth noting. First, a single train/test split had suggested a large advantage for the feature model (0.527 vs. 0.379); cross-validation shows this was largely an artifact of that split, and that the feature model also has substantially higher variance, underscoring the small-data regime. Second, and more usefully, the feature model is fully interpretable: the most informative features are the add/remove ratio, total change size, deletion volume, and parameter references. A per-class breakdown is consistent with hardware intuition: feature changes add substantially more lines and comments, refactors delete more code and touch parameters, and configuration changes are marked mainly by parameter references.
+
+The takeaway is not that hand-crafted features beat text, but that a small, interpretable feature set matches a text baseline on this task and reveals which diff properties carry the intent signal, a form of insight the black-box text models do not provide.
+
+#### Code-review assistant
+
+Finally, we packaged the models into a small application layer: a `review(diff)` function that returns the predicted change intent together with a completeness warning derived from the hole-detection model. On held-out examples it separates complete changes (hole score ~0.2) from synthetic incomplete ones (~0.5), illustrating how the approach could support RTL code review in practice.
+
 ## 8. Limitations and Future Work
 
 The main limitations are:
@@ -420,10 +444,11 @@ The main limitations are:
 
 Future work should focus on manual label validation, broader hole operators, richer HDL-specific structure, and perhaps graph or compiler-informed representations that can better distinguish cleanup from semantic behavior change.
 
-## 9. Team Contribution Placeholders
+## 9. Team Contributions
 
-- Team member 1: `[fill in]`
-- Team member 2: `[fill in]`
+**Korren Hannes** built the core infrastructure: the data-mining pipeline (commit extraction, diff parsing, weak intent labeling, synthetic hole generation, tokenization), the four models (TF-IDF + Logistic Regression, MLP, BiGRU, hierarchical Transformer) with the shared multi-task head, the training and evaluation code, the ablation suite, the initial full runs and main results, and the first report draft.
+
+**Noa Sabag** contributed the analysis and extension layer built on that infrastructure: the per-class error analysis and confusion-matrix study explaining the intent-classification gap; the improved weak-labeling scheme; the cross-project generalization study on Caliptra (including the mining extension to `src/` layouts); the hardware-aware feature model with 5-fold cross-validation and per-class feature analysis; and the code-review assistant demo, together with the corresponding figures and the report sections describing them (Section 7.7).
 
 ## 10. References
 
